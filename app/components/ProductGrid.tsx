@@ -1,6 +1,8 @@
 "use client"
 import { useState,useEffect } from "react"
 import ProductCard from "./ProductCard"
+import { useSearchParams } from "next/navigation"
+
 
 const CATEGORIAS = [
 	"todas",
@@ -15,11 +17,16 @@ const CATEGORIAS = [
 export default function ProductGrid() {
 	const [productos,setProductos] = useState([])
 	const [cargando,setCargando] = useState(true)
-	const [categoriaActiva,setCategoriaActiva] = useState("todas")
+	
+	const searchParams = useSearchParams()
+	const categoriaParam = searchParams.get("categoria") || "todas"
+
+	const [categoriaActiva,setCategoriaActiva] = useState(categoriaParam)
 
 	useEffect(() => {
-		cargarProductos("todas")
+		cargarProductos(categoriaActiva)
 	},[])
+	
 
 	const cargarProductos = async (categoria) => {
 		setCargando(true)

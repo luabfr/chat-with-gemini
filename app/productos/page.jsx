@@ -1,3 +1,4 @@
+import { Suspense } from "react"
 import ProductGrid from "../components/ProductGrid"
 import Link from "next/link"
 
@@ -26,7 +27,9 @@ export default function ProductosPage() {
 				<p style={{ color: "#666",marginBottom: 32 }}>
 					Explorá nuestro catálogo de productos
 				</p>
-				<ProductGrid />
+				<Suspense fallback={<p>Cargando...</p>}>
+					<ProductGrid />
+				</Suspense>
 			</main>
 		</>
 	)

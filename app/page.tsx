@@ -1,216 +1,106 @@
-"use client"
-import { useState } from "react"
+import Image from "next/image"
 import Link from "next/link"
-import { useCart } from "./context/CartContext"
+import HomeProductCard from "./components/HomeProductCard"
 
-export default function Home() {
-  const [mensaje,setMensaje] = useState("")
-  // const [mensajes,setMensajes] = useState([])
-  // const [historial,setHistorial] = useState([])
-  const [mensajes,setMensajes] = useState<{ rol: string; texto: string }[]>([])
-  const [historial,setHistorial] = useState<{ role: string; parts: { text: string }[] }[]>([])
-  const [cargando,setCargando] = useState(false)
+const CATEGORIAS = [
+  { id: "smartphones",label: "📱 Smartphones" },
+  { id: "laptops",label: "💻 Laptops" },
+  { id: "skincare",label: "✨ Skincare" },
+  { id: "home-decoration",label: "🏠 Decoración" },
+]
 
-  const { agregarAlCarrito,carrito } = useCart()
+async function getProductosPorCategoria(categoria: string) {
+  const res = await fetch(
+    `https://dummyjson.com/products/category/${categoria}?limit=6`,
+    { next: { revalidate: 3600 } }
+  )
+  const data = await res.json()
+  return data.products
+}
 
-  const enviar = async () => {
-    if (!mensaje.trim() || cargando) return
-
-    const mensajeUsuario = mensaje
-    setMensaje("")
-    setCargando(true)
-
-    // Agregar mensaje del usuario a la UI
-    const nuevosMensajes = [
-      ...mensajes,
-      { rol: "usuario",texto: mensajeUsuario }
-    ]
-    setMensajes(nuevosMensajes)
-
-    try {
-      const res = await fetch("/api/chat",{
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          mensaje: mensajeUsuario,
-          historial: historial
-        })
-      })
-
-      const data = await res.json()
-
-      let textoRespuesta = data.respuesta
-
-      try {
-        // Buscar todos los JSONs en la respuesta con regex
-        const matches = data.respuesta.match(/\{[^}]+\}/g)
-
-        if (matches && matches.length > 0) {
-          const mensajes: string[] = []
-
-          for (const match of matches) {
-            const accion = JSON.parse(match)
-            if (accion.accion === "agregar_carrito") {
-              const resProducto = await fetch(`https://dummyjson.com/products/${accion.producto_id}`)
-              const producto = await resProducto.json()
-              agregarAlCarrito(producto)
-              mensajes.push(accion.mensaje)
-            }
-          }
-
-          // Unir todos los mensajes en uno solo
-          if (mensajes.length > 0) {
-            textoRespuesta = mensajes.join(" ")
-          }
-        }
-      } catch {
-        // Era texto normal, no hacemos nada
-      }
-
-      // Agregar respuesta de la IA a la UI
-        setMensajes([...nuevosMensajes,{ rol: "ia",texto: textoRespuesta }])
-
-      // Actualizar historial para la próxima llamada
-      setHistorial([
-        ...historial,
-        {
-          role: "user",
-          parts: [{ text: mensajeUsuario }]
-        },
-        {
-          role: "model",
-          parts: [{ text: data.respuesta }]
-        }
-      ])
-
-    } catch (error) {
-      setMensajes([
-        ...nuevosMensajes,
-        { rol: "ia",texto: "Hubo un error. Intentá de nuevo." }
-      ])
-    }
-
-    setCargando(false)
-  }
+export default async function Home() {
+  const secciones = await Promise.all(
+    CATEGORIAS.map(async (cat) => ({
+      ...cat,
+      productos: await getProductosPorCategoria(cat.id)
+    }))
+  )
 
   return (
-      <>
-    {/* Navbar */}
-    <nav style={{
-      borderBottom: "1px solid #e0e0e0",
-      padding: "14px 40px",
-      display: "flex",
-      gap: 24,
-      background: "white"
-    }}>
-      <Link href="/" style={{ textDecoration: "none", color: "#0070f3", fontWeight: 600 }}>
-        💬 Chat con Max
-      </Link >
-      <Link href="/productos" style={{ textDecoration: "none", color: "#333", fontWeight: 500 }}>
-        🛍️ Productos
-      </Link >
-    </nav>
+    <main style={{ maxWidth: 1200,margin: "0 auto",padding: "40px 20px" }}>
 
-    <main style={{ maxWidth: 650, margin: "40px auto", padding: "0 20px" }}>
-
-      <h1 style={{ marginBottom: 4 }}>🛒 Asistente de tienda</h1>
-      <p style={{ color: "#666",marginBottom: 20 }}>
-        Preguntame sobre productos, precios o categorías
-      </p>
-
-      {/* Área de mensajes */}
+      {/* Hero */}
       <div style={{
-        border: "1px solid #e0e0e0",
-        borderRadius: 12,
-        padding: 16,
-        minHeight: 400,
-        maxHeight: 500,
-        overflowY: "auto",
-        marginBottom: 16,
-        background: "#fafafa"
+        background: "linear-gradient(135deg, #0070f3, #00c6ff)",
+        borderRadius: 16,
+        padding: "48px 40px",
+        marginBottom: 48,
+        color: "white"
       }}>
-        {mensajes.length === 0 && (
-          <p style={{ color: "#999",textAlign: "center",marginTop: 80 }}>
-            Escribí algo para empezar. Por ejemplo:<br />
-            <em>&quot;¿Qué productos tienen disponibles?&quot;</em><br />
-            <em>&quot;Buscame algo de electrónica&quot;</em><br />
-            <em>&quot;¿Cuál es el producto más barato?&quot;</em>
-          </p>
-        )}
-
-        {mensajes.map((m,i) => (
-          <div
-            key={i}
-            style={{
-              display: "flex",
-              justifyContent: m.rol === "usuario" ? "flex-end" : "flex-start",
-              marginBottom: 12
-            }}
-          >
-            <span style={{
-              background: m.rol === "usuario" ? "#0070f3" : "#ffffff",
-              color: m.rol === "usuario" ? "white" : "#333",
-              padding: "10px 14px",
-              borderRadius: m.rol === "usuario" ? "18px 18px 4px 18px" : "18px 18px 18px 4px",
-              maxWidth: "75%",
-              lineHeight: 1.5,
-              border: m.rol === "ia" ? "1px solid #e0e0e0" : "none",
-              whiteSpace: "pre-wrap"
-            }}>
-              {m.texto}
-            </span>
-          </div>
-        ))}
-
-        {cargando && (
-          <div style={{ display: "flex",justifyContent: "flex-start" }}>
-            <span style={{
-              background: "#ffffff",
-              border: "1px solid #e0e0e0",
-              padding: "10px 14px",
-              borderRadius: "18px 18px 18px 4px",
-              color: "#999"
-            }}>
-              Max está escribiendo...
-            </span>
-          </div>
-        )}
-      </div>
-
-      {/* Input */}
-      <div style={{ display: "flex",gap: 8 }}>
-        <input
-          value={mensaje}
-          onChange={e => setMensaje(e.target.value)}
-          onKeyDown={e => e.key === "Enter" && enviar()}
-          placeholder="Escribí tu pregunta..."
-          disabled={cargando}
+        <h1 style={{ margin: "0 0 8px",fontSize: 36,fontWeight: 800 }}>
+          🛒 Mi Tienda
+        </h1>
+        <p style={{ margin: "0 0 24px",fontSize: 18,opacity: 0.9 }}>
+          Explorá miles de productos. Preguntale a Max si necesitás ayuda.
+        </p>
+        <Link
+          href="/productos"
           style={{
-            flex: 1,
-            padding: "12px 16px",
-            borderRadius: 24,
-            border: "1px solid #e0e0e0",
-            fontSize: 15,
-            outline: "none"
-          }}
-        />
-        <button
-          onClick={enviar}
-          disabled={cargando}
-          style={{
-            padding: "12px 20px",
-            background: cargando ? "#ccc" : "#0070f3",
-            color: "white",
-            border: "none",
-            borderRadius: 24,
-            cursor: cargando ? "not-allowed" : "pointer",
+            display: "inline-block",
+            padding: "12px 28px",
+            background: "white",
+            color: "#0070f3",
+            borderRadius: 8,
+            textDecoration: "none",
+            fontWeight: 700,
             fontSize: 15
           }}
         >
-          Enviar
-        </button>
+          Ver catálogo completo →
+        </Link>
       </div>
+
+      {/* Secciones por categoría */}
+      {secciones.map((seccion) => (
+        <section key={seccion.id} style={{ marginBottom: 48 }}>
+
+          {/* Header de sección */}
+          <div style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            marginBottom: 16
+          }}>
+            <h2 style={{ margin: 0,fontSize: 22,fontWeight: 700 }}>
+              {seccion.label}
+            </h2>
+            <Link
+              href={`/productos?categoria=${seccion.id}`}
+              style={{
+                fontSize: 14,
+                color: "#0070f3",
+                textDecoration: "none",
+                fontWeight: 500
+              }}
+            >
+              Ver todos →
+            </Link>
+          </div>
+
+          {/* Scroll horizontal */}
+          <div style={{
+            display: "flex",
+            gap: 16,
+            overflowX: "auto",
+            paddingBottom: 12,
+            scrollbarWidth: "thin",
+          }}>
+            {seccion.productos.map((producto: any) => (
+              <HomeProductCard key={producto.id} producto={producto} />  // ← reemplazá la tarjeta inline
+            ))}
+          </div>
+        </section>
+      ))}
     </main>
-  </>
   )
 }

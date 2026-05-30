@@ -104,9 +104,9 @@ export default function Cart() {
 											<Image
 												src={item.thumbnail}
 												alt={item.title}
+												width={60}
+												height={60}
 												style={{
-													width: 60,
-													height: 60,
 													objectFit: "contain",
 													background: "#f5f5f5",
 													borderRadius: 8
