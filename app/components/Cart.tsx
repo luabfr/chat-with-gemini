@@ -1,7 +1,7 @@
 "use client"
 import { useState } from "react"
 import { useCart } from "../context/CartContext"
-import Image from "next/image"
+import NextImage from "next/image"
 
 export default function Cart() {
 	const [abierto,setAbierto] = useState(false)
@@ -101,7 +101,7 @@ export default function Cart() {
 												borderBottom: "1px solid #f0f0f0"
 											}}
 										>
-											<Image
+											<NextImage
 												src={item.thumbnail}
 												alt={item.title}
 												width={60}

@@ -1,32 +1,35 @@
 "use client"
-import Image from "next/image"
+import NextImage from "next/image"
+import Link from "next/link"
 import { useState } from "react"
 
 export default function HomeProductCard({ producto }: { producto: any }) {
 	const [hovered,setHovered] = useState(false)
+	
 
 	return (
-		<div
-			onMouseEnter={() => setHovered(true)}
-			onMouseLeave={() => setHovered(false)}
-			style={{
-				minWidth: 200,
-				background: "white",
-				border: "1px solid #e0e0e0",
-				borderRadius: 12,
-				overflow: "hidden",
-				flexShrink: 0,
-				transition: "transform 0.2s, box-shadow 0.2s",
-				transform: hovered ? "translateY(-4px)" : "translateY(0)",
-				boxShadow: hovered ? "0 8px 24px rgba(0,0,0,0.1)" : "none",
-			}}
-		>
+		<Link href={`/productos/${producto.id}`} style={{ textDecoration: "none",color: "inherit" }}>
+			<div
+				onMouseEnter={() => setHovered(true)}
+				onMouseLeave={() => setHovered(false)}
+				style={{
+					minWidth: 200,
+					background: "white",
+					border: "1px solid #e0e0e0",
+					borderRadius: 12,
+					overflow: "hidden",
+					flexShrink: 0,
+					transition: "transform 0.2s, box-shadow 0.2s",
+					transform: hovered ? "translateY(-4px)" : "translateY(0)",
+					boxShadow: hovered ? "0 8px 24px rgba(0,0,0,0.1)" : "none",
+				}}
+			>
 			<div style={{
 				height: 160,
 				background: "#f5f5f5",
 				position: "relative"
 			}}>
-				<Image
+				<NextImage
 					src={producto.thumbnail}
 					alt={producto.title}
 					fill
@@ -72,6 +75,7 @@ export default function HomeProductCard({ producto }: { producto: any }) {
 					)}
 				</div>
 			</div>
-		</div>
+			</div>
+		</Link>
 	)
 }

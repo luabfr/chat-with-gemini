@@ -1,6 +1,8 @@
 "use client"
+import Link from "next/link"
 import { useCart } from "../context/CartContext"
-import Image from "next/image"
+import NextImage from "next/image"
+
 
 export default function ProductCard({ producto }: { producto: any }) {
 	const { agregarAlCarrito } = useCart()
@@ -22,6 +24,8 @@ export default function ProductCard({ producto }: { producto: any }) {
 				e.currentTarget.style.boxShadow = "none"
 			}}
 		>
+		<Link href={`/productos/${producto.id}`} style={{ textDecoration: "none", color: "inherit" }}>	
+			
 			{/* Imagen */}
 			<div style={{
 				height: 200,
@@ -31,7 +35,7 @@ export default function ProductCard({ producto }: { producto: any }) {
 				justifyContent: "center",
 				padding: 16
 			}}>
-				<Image
+				<NextImage
 					src={producto.thumbnail}
 					alt={producto.title}
 					width={600}
@@ -99,6 +103,9 @@ export default function ProductCard({ producto }: { producto: any }) {
 				</div>
 			</div>
 
+
+			
+			</Link>
 
 			{/* Agregá este botón al final, dentro del div de padding */}
 			<button
