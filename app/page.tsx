@@ -1,4 +1,3 @@
-import Image from "next/image"
 import Link from "next/link"
 import HomeProductCard from "./components/HomeProductCard"
 
@@ -38,7 +37,7 @@ export default async function Home() {
         color: "white"
       }}>
         <h1 style={{ margin: "0 0 8px",fontSize: 36,fontWeight: 800 }}>
-          🛒 Mi Tienda
+          Bienvenido a MiTienda
         </h1>
         <p style={{ margin: "0 0 24px",fontSize: 18,opacity: 0.9 }}>
           Explorá miles de productos. Preguntale a Max si necesitás ayuda.
@@ -63,8 +62,6 @@ export default async function Home() {
       {/* Secciones por categoría */}
       {secciones.map((seccion) => (
         <section key={seccion.id} style={{ marginBottom: 48 }}>
-
-          {/* Header de sección */}
           <div style={{
             display: "flex",
             justifyContent: "space-between",
@@ -76,27 +73,21 @@ export default async function Home() {
             </h2>
             <Link
               href={`/productos?categoria=${seccion.id}`}
-              style={{
-                fontSize: 14,
-                color: "#0070f3",
-                textDecoration: "none",
-                fontWeight: 500
-              }}
+              style={{ fontSize: 14,color: "#0070f3",textDecoration: "none",fontWeight: 500 }}
             >
               Ver todos →
             </Link>
           </div>
 
-          {/* Scroll horizontal */}
           <div style={{
             display: "flex",
             gap: 16,
             overflowX: "auto",
             paddingBottom: 12,
-            scrollbarWidth: "thin",
+            scrollbarWidth: "thin"
           }}>
             {seccion.productos.map((producto: any) => (
-              <HomeProductCard key={producto.id} producto={producto} />  // ← reemplazá la tarjeta inline
+              <HomeProductCard key={producto.id} producto={producto} />
             ))}
           </div>
         </section>

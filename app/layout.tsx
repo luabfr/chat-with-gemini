@@ -1,6 +1,7 @@
 import { CartProvider } from "./context/CartContext"
 import Cart from "./components/Cart"
 import FloatingChat from "./components/FloatingChat"
+import Navbar from "./components/Navbar"
 import "./globals.css"
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -8,6 +9,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="es">
       <body>
         <CartProvider>
+          <Navbar />
           {children}
           <Cart />
           <FloatingChat />
