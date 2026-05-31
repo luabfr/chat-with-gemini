@@ -25,13 +25,14 @@ export default function ProductGrid() {
 
 	useEffect(() => {
 		cargarProductos(categoriaActiva)
+		
 	},[])
 	
 
 	useEffect(() => {
 		if (buscarParam) {
 			buscarProductos(buscarParam)
-			
+
 		} else {
 			cargarProductos(categoriaActiva)
 		}
@@ -42,11 +43,11 @@ export default function ProductGrid() {
 		const res = await fetch(`https://dummyjson.com/products/search?q=${q}&limit=30`)
 		const data = await res.json()
 		setProductos(data.products)
+		
 		setCargando(false)
 	}
 
-
-	const cargarProductos = async (categoria) => {
+	const cargarProductos = async (categoria: string) => {
 		setCargando(true)
 		const url = categoria === "todas"
 			? "https://dummyjson.com/products?limit=30"
