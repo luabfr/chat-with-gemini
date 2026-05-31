@@ -30,7 +30,6 @@ export default function ProductGrid() {
 
 	useEffect(() => {
 		if (buscarParam) {
-			setBusqueda(buscarParam) // si tenés un estado de búsqueda
 			buscarProductos(buscarParam)
 		} else {
 			cargarProductos(categoriaActiva)
@@ -94,9 +93,24 @@ export default function ProductGrid() {
 			</div>
 
 			{/* Grid */}
+			// Skeleton loader mientras carga
 			{cargando ? (
-				<div style={{ textAlign: "center",padding: 80,color: "#999" }}>
-					Cargando productos...
+				<div style={{
+					display: "grid",
+					gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))",
+					gap: 20
+				}}>
+					{Array.from({ length: 8 }).map((_,i) => (
+						<div key={i} style={{ borderRadius: 12,overflow: "hidden",background: "white",border: "1px solid #e0e0e0" }}>
+							<div className="skeleton" style={{ height: 200 }} />
+							<div style={{ padding: 16,display: "flex",flexDirection: "column",gap: 8 }}>
+								<div className="skeleton" style={{ height: 16,width: "80%" }} />
+								<div className="skeleton" style={{ height: 14,width: "50%" }} />
+								<div className="skeleton" style={{ height: 20,width: "40%" }} />
+								<div className="skeleton" style={{ height: 36,marginTop: 4 }} />
+							</div>
+						</div>
+					))}
 				</div>
 			) : (
 				<div style={{
@@ -104,11 +118,20 @@ export default function ProductGrid() {
 					gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))",
 					gap: 20
 				}}>
-					{productos.map(producto => (
-						<ProductCard key={producto.id} producto={producto} />
+					{productos.map((producto,i) => (
+						<div
+							key={producto.id}
+							className={`animate-fade-in delay-${Math.min(i + 1,6)}`}
+							style={{ opacity: 0 }}  // empieza invisible, la animación lo muestra
+						>
+							<ProductCard producto={producto} />
+						</div>
 					))}
 				</div>
 			)}
+
+
+
 		</div>
 	)
 }

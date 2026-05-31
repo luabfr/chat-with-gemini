@@ -2,10 +2,14 @@
 import { useState } from "react"
 import { useCart } from "../context/CartContext"
 import NextImage from "next/image"
+import { useRouter } from "next/navigation"
 
 export default function Cart() {
 	const [abierto,setAbierto] = useState(false)
 	const { carrito,quitarDelCarrito,agregarAlCarrito,vaciarCarrito,totalItems,totalPrecio } = useCart()
+
+	const router = useRouter()
+
 
 	return (
 		<>
@@ -30,21 +34,25 @@ export default function Cart() {
 			>
 				🛒
 				{totalItems > 0 && (
-					<span style={{
-						position: "absolute",
-						top: -4,
-						right: -4,
-						background: "#e53e3e",
-						color: "white",
-						borderRadius: "50%",
-						width: 20,
-						height: 20,
-						fontSize: 11,
-						display: "flex",
-						alignItems: "center",
-						justifyContent: "center",
-						fontWeight: 700
-					}}>
+					<span
+						key={totalItems}  // ← cambia con cada update, re-triggerea la animación
+						className="animate-bounce-count"
+						style={{
+							position: "absolute",
+							top: -4,
+							right: -4,
+							background: "#e53e3e",
+							color: "white",
+							borderRadius: "50%",
+							width: 20,
+							height: 20,
+							fontSize: 11,
+							display: "flex",
+							alignItems: "center",
+							justifyContent: "center",
+							fontWeight: 700
+						}}
+					>
 						{totalItems}
 					</span>
 				)}
@@ -74,7 +82,9 @@ export default function Cart() {
 						padding: 24,
 						display: "flex",
 						flexDirection: "column"
-					}}>
+						}}
+						className="animate-slide-right" 
+					>
 						<div style={{ display: "flex",justifyContent: "space-between",alignItems: "center",marginBottom: 24 }}>
 							<h2 style={{ margin: 0 }}>🛒 Carrito ({totalItems})</h2>
 							<button
@@ -174,18 +184,24 @@ export default function Cart() {
 										<span style={{ fontWeight: 600,fontSize: 16 }}>Total</span>
 										<span style={{ fontWeight: 700,fontSize: 20 }}>${totalPrecio.toFixed(2)}</span>
 									</div>
-									<button style={{
-										width: "100%",
-										padding: 14,
-										background: "#0070f3",
-										color: "white",
-										border: "none",
-										borderRadius: 8,
-										fontSize: 16,
-										fontWeight: 600,
-										cursor: "pointer",
-										marginBottom: 8
-									}}>
+										<button
+											onClick={() => {
+												setAbierto(false)
+												router.push("/checkout")
+											}}
+											style={{
+												width: "100%",
+												padding: 14,
+												background: "#0070f3",
+												color: "white",
+												border: "none",
+												borderRadius: 8,
+												fontSize: 16,
+												fontWeight: 600,
+												cursor: "pointer",
+												marginBottom: 8
+											}}
+										>
 										Finalizar compra
 									</button>
 									<button

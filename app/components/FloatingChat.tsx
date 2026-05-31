@@ -115,7 +115,9 @@ export default function FloatingChat() {
 					flexDirection: "column",
 					overflow: "hidden",
 					border: "1px solid #e0e0e0"
-				}}>
+					}}
+					className="animate-slide-up"
+				>
 
 					{/* Header */}
 					<div style={{
