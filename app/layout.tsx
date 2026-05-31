@@ -3,6 +3,7 @@ import Cart from "./components/Cart"
 import ChatSidebar from "./components/ChatSidebar"
 import Navbar from "./components/Navbar"
 import "./globals.css"
+import Script from "next/script"  // ← agregá este import
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -25,6 +26,19 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           </div>
           <Cart />
         </CartProvider>
+
+
+        {/* Clarity */}
+        <Script id="clarity" strategy="afterInteractive">
+          {`
+            (function(c,l,a,r,i,t,y){
+              c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+              t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+              y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+            })(window, document, "clarity", "script", "wzudpbde88");
+          `}
+        </Script>
+
       </body>
     </html>
   )
