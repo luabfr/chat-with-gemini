@@ -92,7 +92,7 @@ export default function Navbar() {
 					<div style={{ display: "flex",alignItems: "center",gap: 8 }}>
 						<span style={{ fontSize: 24 }}>🛒</span>
 						<span style={{ fontSize: 20,fontWeight: 800,color: "#1a1a1a",letterSpacing: "-0.5px" }}>
-							Mi<span style={{ color: "#0070f3" }}>Tienda</span>
+							Market<span style={{ color: "#0070f3" }}>Chat</span>
 						</span>
 					</div>
 				</Link>

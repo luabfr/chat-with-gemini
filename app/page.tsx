@@ -37,7 +37,7 @@ export default async function Home() {
         color: "white"
       }}>
         <h1 style={{ margin: "0 0 8px",fontSize: 36,fontWeight: 800 }}>
-          Bienvenido a MiTienda
+          Bienvenido a MarketChat
         </h1>
         <p style={{ margin: "0 0 24px",fontSize: 18,opacity: 0.9 }}>
           Explorá miles de productos. Preguntale a Max si necesitás ayuda.

@@ -165,8 +165,8 @@ export default function ChatSidebar() {
 						{/* Sugerencias */}
 						{[
 							"¿Qué productos tienen?",
-							"Buscame algo de electrónica",
-							"¿Cuál tiene mejor rating?",
+							"Buscame el iPhone mas barato",
+							"Haceme una receta con $50 con los productos que tengas",
 						].map(sugerencia => (
 							<button
 								key={sugerencia}
