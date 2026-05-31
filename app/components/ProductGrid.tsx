@@ -31,6 +31,7 @@ export default function ProductGrid() {
 	useEffect(() => {
 		if (buscarParam) {
 			buscarProductos(buscarParam)
+			
 		} else {
 			cargarProductos(categoriaActiva)
 		}
