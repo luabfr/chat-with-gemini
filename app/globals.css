@@ -1,5 +1,34 @@
 @import "tailwindcss";
 
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  background-color: #ffffff;
+  color: #1a1a1a;
+  margin: 0;
+  padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+input,
+button,
+textarea,
+select {
+  color: #1a1a1a;
+  background-color: #ffffff;
+  font-family: inherit;
+}
+
+a {
+  color: inherit;
+}
+
 :root {
   --background: #ffffff;
   --foreground: #171717;

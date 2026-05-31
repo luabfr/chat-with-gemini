@@ -1,8 +1,18 @@
 "use client"
-import { useState,useEffect } from "react"
-import ProductCard from "./ProductCard"
+import { useState,useEffect,useCallback } from "react"
 import { useSearchParams } from "next/navigation"
+import ProductCard from "./ProductCard"
 
+interface Producto {
+	id: number
+	title: string
+	price: number
+	thumbnail: string
+	category: string
+	rating: number
+	stock: number
+	discountPercentage: number
+}
 
 const CATEGORIAS = [
 	"todas",
@@ -15,64 +25,50 @@ const CATEGORIAS = [
 ]
 
 export default function ProductGrid() {
-	const [productos,setProductos] = useState([])
-	const [cargando,setCargando] = useState(true)
-	
 	const searchParams = useSearchParams()
 	const categoriaParam = searchParams.get("categoria") || "todas"
 	const buscarParam = searchParams.get("buscar") || ""
+
+	const [productos,setProductos] = useState<Producto[]>([])
+	const [cargando,setCargando] = useState(true)
 	const [categoriaActiva,setCategoriaActiva] = useState(categoriaParam)
 
-	useEffect(() => {
-		cargarProductos(categoriaActiva)
-		
-	},[])
-	
-
-	useEffect(() => {
-		if (buscarParam) {
-			buscarProductos(buscarParam)
-
-		} else {
-			cargarProductos(categoriaActiva)
-		}
-	},[])
-
-	const buscarProductos = async (q: string) => {
-		setCargando(true)
-		const res = await fetch(`https://dummyjson.com/products/search?q=${q}&limit=30`)
-		const data = await res.json()
-		setProductos(data.products)
-		
-		setCargando(false)
-	}
-
-	const cargarProductos = async (categoria: string) => {
+	const cargarProductos = useCallback(async (categoria: string) => {
 		setCargando(true)
 		const url = categoria === "todas"
 			? "https://dummyjson.com/products?limit=30"
 			: `https://dummyjson.com/products/category/${categoria}?limit=30`
-
 		const res = await fetch(url)
 		const data = await res.json()
 		setProductos(data.products)
 		setCargando(false)
-	}
+	},[])
 
-	const handleCategoria = (categoria) => {
+	const buscarProductos = useCallback(async (q: string) => {
+		setCargando(true)
+		const res = await fetch(`https://dummyjson.com/products/search?q=${q}&limit=30`)
+		const data = await res.json()
+		setProductos(data.products)
+		setCargando(false)
+	},[])
+
+	const handleCategoria = (categoria: string) => {
 		setCategoriaActiva(categoria)
 		cargarProductos(categoria)
 	}
 
+	useEffect(() => {
+		if (buscarParam) {
+			buscarProductos(buscarParam)
+		} else {
+			cargarProductos(categoriaActiva)
+		}
+	},[buscarParam,categoriaActiva,cargarProductos,buscarProductos])
+
 	return (
 		<div>
 			{/* Filtros */}
-			<div style={{
-				display: "flex",
-				gap: 8,
-				flexWrap: "wrap",
-				marginBottom: 24
-			}}>
+			<div style={{ display: "flex",gap: 8,flexWrap: "wrap",marginBottom: 24 }}>
 				{CATEGORIAS.map(cat => (
 					<button
 						key={cat}
@@ -95,7 +91,6 @@ export default function ProductGrid() {
 			</div>
 
 			{/* Grid */}
-			// Skeleton loader mientras carga
 			{cargando ? (
 				<div style={{
 					display: "grid",
@@ -124,16 +119,13 @@ export default function ProductGrid() {
 						<div
 							key={producto.id}
 							className={`animate-fade-in delay-${Math.min(i + 1,6)}`}
-							style={{ opacity: 0 }}  // empieza invisible, la animación lo muestra
+							style={{ opacity: 0 }}
 						>
 							<ProductCard producto={producto} />
 						</div>
 					))}
 				</div>
 			)}
-
-
-
 		</div>
 	)
 }
