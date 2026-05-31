@@ -19,7 +19,7 @@ const CATEGORIAS = [
 	"smartphones",
 	"laptops",
 	"fragrances",
-	"skincare",
+	"beauty",
 	"groceries",
 	"home-decoration"
 ]

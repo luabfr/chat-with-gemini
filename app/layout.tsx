@@ -1,6 +1,6 @@
 import { CartProvider } from "./context/CartContext"
 import Cart from "./components/Cart"
-import FloatingChat from "./components/FloatingChat"
+import ChatSidebar from "./components/ChatSidebar"
 import Navbar from "./components/Navbar"
 import "./globals.css"
 
@@ -10,9 +10,20 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body style={{ background: "#ffffff",color: "#1a1a1a",margin: 0 }}>
         <CartProvider>
           <Navbar />
-          {children}
+          <div style={{
+            display: "flex",
+            minHeight: "calc(100vh - 64px)"
+          }}>
+            <ChatSidebar />
+            <div style={{
+              flex: 1,
+              minWidth: 0,
+              overflowY: "auto"
+            }}>
+              {children}
+            </div>
+          </div>
           <Cart />
-          <FloatingChat />
         </CartProvider>
       </body>
     </html>

@@ -6,7 +6,7 @@ export async function POST(req) {
   const { mensaje, historial } = await req.json()
 
   const CATEGORIAS = [
-    "smartphones", "laptops", "skincare",
+    "smartphones", "laptops", "beauty",
     "home-decoration", "fragrances", "groceries"
   ]
 

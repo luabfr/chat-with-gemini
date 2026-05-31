@@ -4,7 +4,7 @@ import HomeProductCard from "./components/HomeProductCard"
 const CATEGORIAS = [
   { id: "smartphones",label: "📱 Smartphones" },
   { id: "laptops",label: "💻 Laptops" },
-  { id: "skincare",label: "✨ Skincare" },
+  { id: "beauty",label: "✨ Beauty" },
   { id: "home-decoration",label: "🏠 Decoración" },
 ]
 
@@ -73,7 +73,7 @@ export default async function Home() {
             </h2>
             <Link
               href={`/productos?categoria=${seccion.id}`}
-              style={{ fontSize: 14,color: "#0070f3",textDecoration: "none",fontWeight: 500 }}
+              style={{ fontSize: 18,color: "#0070f3",textDecoration: "none",fontWeight: 500 }}
             >
               Ver todos →
             </Link>
