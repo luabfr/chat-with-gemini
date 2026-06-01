@@ -71,7 +71,7 @@ export default function ProductCard({ producto }: { producto: Product }) {
 					height: 40,
 					overflow: "hidden"
 				}}>
-					{producto.title}
+					{producto.name}
 				</h3>
 
 				{/* Rating */}
@@ -88,7 +88,7 @@ export default function ProductCard({ producto }: { producto: Product }) {
 					<span style={{ fontSize: 20,fontWeight: 700,color: "#1a1a1a" }}>
 						${producto.price}
 					</span>
-					{producto.discountPercentage > 0 && (
+					{producto.discount > 0 && (
 						<span style={{
 							background: "#e8f5e9",
 							color: "#2e7d32",
@@ -97,7 +97,7 @@ export default function ProductCard({ producto }: { producto: Product }) {
 							fontSize: 12,
 							fontWeight: 600
 						}}>
-							-{Math.round(producto.discountPercentage)}% OFF
+							-{Math.round(producto.discount)}% OFF
 						</span>
 					)}
 				</div>

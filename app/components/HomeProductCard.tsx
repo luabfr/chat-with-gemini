@@ -52,7 +52,7 @@ export default function HomeProductCard({ producto }: { producto: Product }) {
 					lineHeight: 1.4,
 					height: 36
 				}}>
-					{producto.title}
+					{producto.name}
 				</p>
 
 				<div style={{ display: "flex",alignItems: "center",gap: 4,margin: "6px 0" }}>
@@ -62,7 +62,7 @@ export default function HomeProductCard({ producto }: { producto: Product }) {
 
 				<div style={{ display: "flex",alignItems: "center",justifyContent: "space-between" }}>
 					<span style={{ fontSize: 18,fontWeight: 700 }}>${producto.price}</span>
-					{producto.discountPercentage > 5 && (
+					{producto.discount > 5 && (
 						<span style={{
 							background: "#e8f5e9",
 							color: "#2e7d32",
@@ -71,7 +71,7 @@ export default function HomeProductCard({ producto }: { producto: Product }) {
 							fontSize: 11,
 							fontWeight: 600
 						}}>
-							-{Math.round(producto.discountPercentage)}%
+							-{Math.round(producto.discount)}%
 						</span>
 					)}
 				</div>

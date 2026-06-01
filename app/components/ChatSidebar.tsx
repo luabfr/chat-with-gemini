@@ -1,6 +1,7 @@
 "use client"
 import { useState } from "react"
 import { useCart } from "../context/CartContext"
+import { createClient } from "../lib/supabase/client"
 
 interface Mensaje {
 	rol: string
@@ -46,10 +47,18 @@ export default function ChatSidebar() {
 					for (const match of matches) {
 						const accion = JSON.parse(match)
 						if (accion.accion === "agregar_carrito") {
-							const resProducto = await fetch(`https://dummyjson.com/products/${accion.producto_id}`)
-							const producto = await resProducto.json()
-							agregarAlCarrito(producto)
-							mensajesAccion.push(accion.mensaje)
+							// ← ahora trae de Supabase en lugar de DummyJSON
+							const supabase = createClient()
+							const { data: producto } = await supabase
+								.from("productos")
+								.select("*")
+								.eq("id",accion.producto_id)
+								.single()
+
+							if (producto) {
+								agregarAlCarrito(producto)
+								mensajesAccion.push(accion.mensaje)
+							}
 						}
 					}
 					if (mensajesAccion.length > 0) textoRespuesta = mensajesAccion.join(" ")

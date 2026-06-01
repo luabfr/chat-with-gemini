@@ -1,17 +1,9 @@
 import NextImage from "next/image"
 import Link from "next/link"
 import AddToCartButton from "../../components/AddToCartButton"
-// import { getProducto } from "../../lib/productos"
-// import { getProductosPorCategorias } from "./lib/productos.server"
 import { getProducto } from "../../lib/productos.server"
 
-// async function getProducto(id: string) {
-// 	const res = await fetch(`https://dummyjson.com/products/${id}`,{
-// 		next: { revalidate: 3600 }
-// 	})
-// 	if (!res.ok) return null
-// 	return res.json()
-// }
+
 
 
 export default async function ProductoDetalle({
