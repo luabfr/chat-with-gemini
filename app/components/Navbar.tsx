@@ -5,6 +5,7 @@ import { useCart } from "../context/CartContext"
 import { useState,useEffect,useRef } from "react"
 import SearchResults from "./SearchResults"
 import { buscarProductosCliente } from "../lib/productos"
+import { Product } from "../lib/types"
 
 export default function Navbar() {
 	const pathname = usePathname()
@@ -12,7 +13,7 @@ export default function Navbar() {
 	const { totalItems } = useCart()
 
 	const [query,setQuery] = useState("")
-	const [resultados,setResultados] = useState([])
+	const [resultados,setResultados] = useState<Product[]>([])
 	const [buscando,setBuscando] = useState(false)
 	const [enfocado,setEnfocado] = useState(false)
 	const searchRef = useRef<HTMLDivElement>(null)
@@ -31,12 +32,15 @@ export default function Navbar() {
 
 	// Buscar con debounce
 	useEffect(() => {
+		if (timerRef.current) clearTimeout(timerRef.current)
+
 		if (!query.trim()) {
-			setResultados([])
+			timerRef.current = setTimeout(() => {
+				setResultados([])
+			},0)
 			return
 		}
-		if (timerRef.current) clearTimeout(timerRef.current)
-		
+
 		timerRef.current = setTimeout(async () => {
 			setBuscando(true)
 			const data = await buscarProductosCliente(query)
@@ -44,6 +48,9 @@ export default function Navbar() {
 			setBuscando(false)
 		},350)
 
+		return () => {
+			if (timerRef.current) clearTimeout(timerRef.current)
+		}
 	},[query])
 
 	const handleSubmit = (e: React.FormEvent) => {
