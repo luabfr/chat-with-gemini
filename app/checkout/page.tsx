@@ -3,13 +3,11 @@ import { useState } from "react"
 import Link from "next/link"
 import NextImage from "next/image"
 import { useCart } from "../context/CartContext"
-import { useRouter } from "next/navigation"
 
 type Paso = "carrito" | "datos" | "confirmacion"
 
 export default function Checkout() {
 	const { carrito,totalItems,totalPrecio,vaciarCarrito } = useCart()
-	const router = useRouter()
 	const [paso,setPaso] = useState<Paso>("carrito")
 	const [form,setForm] = useState({
 		nombre: "",

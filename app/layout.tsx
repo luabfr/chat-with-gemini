@@ -3,12 +3,20 @@ import Cart from "./components/Cart"
 import ChatSidebar from "./components/ChatSidebar"
 import Navbar from "./components/Navbar"
 import "./globals.css"
-import Script from "next/script"  // ← agregá este import
+import Script from "next/script"  
+import Clarity from '@microsoft/clarity';
+import { Analytics } from "@vercel/analytics/next"
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
+  const projectId = "wzudpbde88"
+  Clarity.init(projectId);
+
+
+
   return (
     <html lang="es">
       <body style={{ background: "#ffffff",color: "#1a1a1a",margin: 0 }}>
+        <Analytics />
         <CartProvider>
           <Navbar />
           <div style={{

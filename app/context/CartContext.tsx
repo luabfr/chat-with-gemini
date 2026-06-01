@@ -1,6 +1,5 @@
 "use client"
 import { createContext,useContext,useState,ReactNode } from "react"
-import { Product } from "../lib/types"
 
 export interface CartProduct {
 	id: number

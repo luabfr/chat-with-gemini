@@ -93,6 +93,7 @@ export default function Navbar() {
 				height: 64,
 				display: "flex",
 				alignItems: "center",
+				justifyContent: "space-between",
 				gap: 24
 			}}>
 
