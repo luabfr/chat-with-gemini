@@ -1,20 +1,21 @@
 "use client"
 import NextImage from "next/image"
 import Link from "next/link"
+import { Product } from "../lib/types"
 
-interface Producto {
-	id: number
-	title: string
-	price: number
-	thumbnail: string
-	category: string
-}
+// interface Producto {
+// 	id: number
+// 	title: string
+// 	price: number
+// 	thumbnail: string
+// 	category: string
+// }
 
 export default function SearchResults({
 	resultados,
 	onClose
 }: {
-	resultados: Producto[]
+	resultados: Product[]
 	onClose: () => void
 }) {
 	if (resultados.length === 0) return null
@@ -63,7 +64,7 @@ export default function SearchResults({
 					}}>
 						<NextImage
 							src={producto.thumbnail}
-							alt={producto.title}
+							alt={producto.name}
 							fill
 							style={{ objectFit: "contain",padding: 4 }}
 							sizes="48px"
@@ -79,7 +80,7 @@ export default function SearchResults({
 							overflow: "hidden",
 							textOverflow: "ellipsis"
 						}}>
-							{producto.title}
+							{producto.name}
 						</p>
 						<p style={{ margin: 0,fontSize: 12,color: "#666",textTransform: "capitalize" }}>
 							{producto.category}

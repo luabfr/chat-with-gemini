@@ -2,9 +2,9 @@
 import Link from "next/link"
 import { useCart } from "../context/CartContext"
 import NextImage from "next/image"
+import { Product } from "../lib/types"
 
-
-export default function ProductCard({ producto }: { producto: any }) {
+export default function ProductCard({ producto }: { producto: Product }) {
 	const { agregarAlCarrito } = useCart()
 	return (
 		<div style={{
@@ -37,7 +37,7 @@ export default function ProductCard({ producto }: { producto: any }) {
 			}}>
 				<NextImage
 					src={producto.thumbnail}
-					alt={producto.title}
+					alt={producto.name}
 					width={600}
 					height={400}
 					style={{

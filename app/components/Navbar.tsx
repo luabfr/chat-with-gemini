@@ -4,6 +4,7 @@ import { usePathname,useRouter } from "next/navigation"
 import { useCart } from "../context/CartContext"
 import { useState,useEffect,useRef } from "react"
 import SearchResults from "./SearchResults"
+import { buscarProductosCliente } from "../lib/productos"
 
 export default function Navbar() {
 	const pathname = usePathname()
@@ -35,13 +36,14 @@ export default function Navbar() {
 			return
 		}
 		if (timerRef.current) clearTimeout(timerRef.current)
+		
 		timerRef.current = setTimeout(async () => {
 			setBuscando(true)
-			const res = await fetch(`https://dummyjson.com/products/search?q=${query}&limit=6`)
-			const data = await res.json()
-			setResultados(data.products || [])
+			const data = await buscarProductosCliente(query)
+			setResultados(data)
 			setBuscando(false)
 		},350)
+
 	},[query])
 
 	const handleSubmit = (e: React.FormEvent) => {

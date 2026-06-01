@@ -113,7 +113,7 @@ export default function Cart() {
 										>
 											<NextImage
 												src={item.thumbnail}
-												alt={item.title}
+												alt={item.name}
 												width={60}
 												height={60}
 												style={{
@@ -124,7 +124,7 @@ export default function Cart() {
 											/>
 											<div style={{ flex: 1 }}>
 												<p style={{ margin: "0 0 4px",fontSize: 14,fontWeight: 600 }}>
-													{item.title}
+													{item.name}
 												</p>
 												<p style={{ margin: "0 0 8px",fontSize: 13,color: "#666" }}>
 													${item.price} × {item.cantidad} ={" "}
@@ -154,7 +154,7 @@ export default function Cart() {
 													<button
 														onClick={() => agregarAlCarrito({
 															id: item.id,
-															title: item.title,
+															name: item.name,
 															price: item.price,
 															thumbnail: item.thumbnail,
 															category: item.category

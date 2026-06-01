@@ -202,14 +202,14 @@ export default function Checkout() {
 										}}>
 											<NextImage
 												src={item.thumbnail}
-												alt={item.title}
+												alt={item.name}
 												fill
 												style={{ objectFit: "contain",padding: 4 }}
 												sizes="64px"
 											/>
 										</div>
 										<div style={{ flex: 1 }}>
-											<p style={{ margin: "0 0 4px",fontWeight: 600,fontSize: 14 }}>{item.title}</p>
+											<p style={{ margin: "0 0 4px",fontWeight: 600,fontSize: 14 }}>{item.name}</p>
 											<p style={{ margin: 0,fontSize: 13,color: "#666" }}>
 												Cantidad: {item.cantidad}
 											</p>

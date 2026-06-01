@@ -1,14 +1,18 @@
 import NextImage from "next/image"
 import Link from "next/link"
 import AddToCartButton from "../../components/AddToCartButton"
+// import { getProducto } from "../../lib/productos"
+// import { getProductosPorCategorias } from "./lib/productos.server"
+import { getProducto } from "../../lib/productos.server"
 
-async function getProducto(id: string) {
-	const res = await fetch(`https://dummyjson.com/products/${id}`,{
-		next: { revalidate: 3600 }
-	})
-	if (!res.ok) return null
-	return res.json()
-}
+// async function getProducto(id: string) {
+// 	const res = await fetch(`https://dummyjson.com/products/${id}`,{
+// 		next: { revalidate: 3600 }
+// 	})
+// 	if (!res.ok) return null
+// 	return res.json()
+// }
+
 
 export default async function ProductoDetalle({
 	params
@@ -16,7 +20,7 @@ export default async function ProductoDetalle({
 	params: Promise<{ id: string }>
 }) {
 	const { id } = await params
-	const producto = await getProducto(id)
+	const producto = await getProducto(Number(id))
 
 	if (!producto) {
 		return (
@@ -43,7 +47,7 @@ export default async function ProductoDetalle({
 					{producto.category}
 				</Link>
 				{" / "}
-				<span style={{ color: "#333" }}>{producto.title}</span>
+				<span style={{ color: "#333" }}>{producto.name}</span>
 			</nav>
 
 			{/* Layout principal */}
@@ -66,13 +70,13 @@ export default async function ProductoDetalle({
 					}}>
 						<NextImage 
 							src={producto.images?.[0] || producto.thumbnail}
-							alt={producto.title}
+							alt={producto.name}
 							fill
 							style={{ objectFit: "contain",padding: 24 }}
 							sizes="500px"
 							priority
 						/>
-						{producto.discountPercentage > 5 && (
+						{producto.discount > 5 && (
 							<span style={{
 								position: "absolute",
 								top: 16,
@@ -84,7 +88,7 @@ export default async function ProductoDetalle({
 								fontSize: 13,
 								fontWeight: 700
 							}}>
-								-{Math.round(producto.discountPercentage)}% OFF
+								-{Math.round(producto.discount)}% OFF
 							</span>
 						)}
 					</div>
@@ -103,7 +107,7 @@ export default async function ProductoDetalle({
 								}}>
 									<NextImage 
 										src={img}
-										alt={`${producto.title} ${i + 1}`}
+										alt={`${producto.name} ${i + 1}`}
 										fill
 										style={{ objectFit: "contain",padding: 4 }}
 										sizes="72px"
@@ -127,16 +131,12 @@ export default async function ProductoDetalle({
 					</span>
 
 					<h1 style={{ margin: "8px 0 4px",fontSize: 28,fontWeight: 800,lineHeight: 1.2 }}>
-						{producto.title}
+						{producto.name}
 					</h1>
 
-					{producto.brand && (
-						<p style={{ margin: "0 0 16px",color: "#666",fontSize: 14 }}>
-							por <strong>{producto.brand}</strong>
-						</p>
-					)}
+					
 
-					<div style={{ display: "flex",alignItems: "center",gap: 8,marginBottom: 20 }}>
+					{/* <div style={{ display: "flex",alignItems: "center",gap: 8,marginBottom: 20 }}>
 						<div style={{ display: "flex",gap: 2 }}>
 							{[1,2,3,4,5].map((star) => (
 								<span key={star} style={{
@@ -146,24 +146,24 @@ export default async function ProductoDetalle({
 							))}
 						</div>
 						<span style={{ fontSize: 14,color: "#666" }}>
-							{producto.rating} · {producto.reviews?.length || 0} reseñas
+							{producto.rating} · {producto.rating?.length || 0} reseñas
 						</span>
-					</div>
+					</div> */}
 
 					<div style={{ marginBottom: 24 }}>
 						<div style={{ display: "flex",alignItems: "baseline",gap: 12 }}>
 							<span style={{ fontSize: 36,fontWeight: 800,color: "#1a1a1a" }}>
 								${producto.price}
 							</span>
-							{producto.discountPercentage > 5 && (
+							{producto.discount > 5 && (
 								<span style={{ fontSize: 16,color: "#999",textDecoration: "line-through" }}>
-									${(producto.price / (1 - producto.discountPercentage / 100)).toFixed(2)}
+									${(producto.price / (1 - producto.discount / 100)).toFixed(2)}
 								</span>
 							)}
 						</div>
-						{producto.discountPercentage > 5 && (
+						{producto.discount > 5 && (
 							<p style={{ margin: "4px 0 0",color: "#2e7d32",fontSize: 14,fontWeight: 600 }}>
-								Ahorrás ${((producto.price / (1 - producto.discountPercentage / 100)) - producto.price).toFixed(2)}
+								Ahorrás ${((producto.price / (1 - producto.discount / 100)) - producto.price).toFixed(2)}
 							</p>
 						)}
 					</div>
@@ -189,7 +189,7 @@ export default async function ProductoDetalle({
 
 					<AddToCartButton producto={producto} />
 
-					{producto.tags?.length > 0 && (
+					{/* {producto.tags?.length > 0 && (
 						<div style={{ display: "flex",gap: 8,flexWrap: "wrap",marginTop: 24 }}>
 							{producto.tags.map((tag: string) => (
 								<span key={tag} style={{
@@ -203,12 +203,12 @@ export default async function ProductoDetalle({
 								</span>
 							))}
 						</div>
-					)}
+					)} */}
 				</div>
 			</div>
 
 			{/* Reseñas */}
-			{producto.reviews?.length > 0 && (
+			{/* {producto.reviews?.length > 0 && (
 				<section style={{ marginTop: 64 }}>
 					<h2 style={{ fontSize: 22,fontWeight: 700,marginBottom: 24 }}>
 						Reseñas ({producto.reviews.length})
@@ -243,7 +243,7 @@ export default async function ProductoDetalle({
 						))}
 					</div>
 				</section>
-			)}
+			)} */}
 
 		</main>
 	)

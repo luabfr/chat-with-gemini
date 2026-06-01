@@ -2,17 +2,9 @@
 import { useState,useEffect,useCallback } from "react"
 import { useSearchParams } from "next/navigation"
 import ProductCard from "./ProductCard"
-
-interface Producto {
-	id: number
-	title: string
-	price: number
-	thumbnail: string
-	category: string
-	rating: number
-	stock: number
-	discountPercentage: number
-}
+import { buscarProductosCliente } from "../lib/productos"
+import { createClient } from "../lib/supabase/client"
+import { Product } from "../lib/types"
 
 const CATEGORIAS = [
 	"todas",
@@ -29,26 +21,32 @@ export default function ProductGrid() {
 	const categoriaParam = searchParams.get("categoria") || "todas"
 	const buscarParam = searchParams.get("buscar") || ""
 
-	const [productos,setProductos] = useState<Producto[]>([])
+	const [productos,setProductos] = useState<Product[]>([])
 	const [cargando,setCargando] = useState(true)
 	const [categoriaActiva,setCategoriaActiva] = useState(categoriaParam)
 
 	const cargarProductos = useCallback(async (categoria: string) => {
 		setCargando(true)
-		const url = categoria === "todas"
-			? "https://dummyjson.com/products?limit=30"
-			: `https://dummyjson.com/products/category/${categoria}?limit=30`
-		const res = await fetch(url)
-		const data = await res.json()
-		setProductos(data.products)
+		const supabase = createClient()
+
+		let query = supabase
+			.from("productos")
+			.select("*")
+			.eq("active",true)
+
+		if (categoria !== "todas") {
+			query = query.eq("category",categoria)
+		}
+
+		const { data } = await query
+		setProductos(data as Product[] || [])
 		setCargando(false)
 	},[])
 
 	const buscarProductos = useCallback(async (q: string) => {
 		setCargando(true)
-		const res = await fetch(`https://dummyjson.com/products/search?q=${q}&limit=30`)
-		const data = await res.json()
-		setProductos(data.products)
+		const resultados = await buscarProductosCliente(q)
+		setProductos(resultados)
 		setCargando(false)
 	},[])
 

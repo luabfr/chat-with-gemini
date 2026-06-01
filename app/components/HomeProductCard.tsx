@@ -2,8 +2,9 @@
 import NextImage from "next/image"
 import Link from "next/link"
 import { useState } from "react"
+import { Product } from "../lib/types"
 
-export default function HomeProductCard({ producto }: { producto: any }) {
+export default function HomeProductCard({ producto }: { producto: Product }) {
 	const [hovered,setHovered] = useState(false)
 	
 
@@ -31,7 +32,7 @@ export default function HomeProductCard({ producto }: { producto: any }) {
 			}}>
 				<NextImage
 					src={producto.thumbnail}
-					alt={producto.title}
+					alt={producto.name}
 					fill
 					style={{ objectFit: "contain",padding: 12 }}
 					sizes="200px"
