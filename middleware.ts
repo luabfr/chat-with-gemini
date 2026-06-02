@@ -1,6 +1,8 @@
 import { createServerClient } from "@supabase/ssr"
 import { NextResponse,type NextRequest } from "next/server"
 
+const RUTAS_PROTEGIDAS = ["/cuenta","/checkout"]
+
 export async function middleware(request: NextRequest) {
 	let supabaseResponse = NextResponse.next({ request })
 
@@ -25,7 +27,25 @@ export async function middleware(request: NextRequest) {
 		}
 	)
 
-	await supabase.auth.getUser()
+	const { data: { user } } = await supabase.auth.getUser()
+
+	const pathname = request.nextUrl.pathname
+
+	// Redirigir a login si la ruta está protegida y no hay sesión
+	const esRutaProtegida = RUTAS_PROTEGIDAS.some(ruta => pathname.startsWith(ruta))
+	if (esRutaProtegida && !user) {
+		const url = request.nextUrl.clone()
+		url.pathname = "/login"
+		url.searchParams.set("redirect",pathname)
+		return NextResponse.redirect(url)
+	}
+
+	// Redirigir a home si ya está logueado e intenta ir a login o registro
+	if (user && (pathname === "/login" || pathname === "/registro")) {
+		const url = request.nextUrl.clone()
+		url.pathname = "/"
+		return NextResponse.redirect(url)
+	}
 
 	return supabaseResponse
 }
