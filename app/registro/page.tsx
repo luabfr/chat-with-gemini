@@ -1,7 +1,7 @@
 "use client"
 import { useState } from "react"
 import { createClient } from "../lib/supabase/client"
-import { useRouter } from "next/navigation"
+// import { useRouter } from "next/navigation"
 import Link from "next/link"
 
 export default function RegistroPage() {
@@ -12,7 +12,7 @@ export default function RegistroPage() {
 	const [error,setError] = useState("")
 	const [exito,setExito] = useState(false)
 	const [cargando,setCargando] = useState(false)
-	const router = useRouter()
+	// const router = useRouter()
 	const supabase = createClient()
 
 	const handleRegistro = async () => {
