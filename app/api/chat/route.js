@@ -6,8 +6,9 @@ const groq = new Groq({ apiKey: process.env.GROQ_API_KEY })
 export async function POST(req) {
   const { mensaje, historial } = await req.json()
 
-  // Traer productos desde Supabase
   const supabase = await createClient()
+
+  // Traer productos
   const { data: products } = await supabase
     .from("productos")
     .select("id, name, price, category, description, stock, rating")
@@ -25,18 +26,31 @@ export async function POST(req) {
   }))
 
   const systemPrompt = `
-    Sos Max, un asistente de ecommerce amable y útil.
-    Respondé siempre en español, de forma clara y concisa.
-    Solo respondés preguntas relacionadas a los productos disponibles.
-    Cuando recomiendes un producto mencioná nombre, precio y por qué lo recomendás.
-    Cuando el usuario quiera agregar un producto al carrito,
-    respondé ÚNICAMENTE con este formato JSON, sin texto adicional:
-    {"accion": "agregar_carrito", "producto_id": ID, "mensaje": "Tu mensaje"}
-    Para múltiples productos, uno por línea:
-    {"accion": "agregar_carrito", "producto_id": 1, "mensaje": "Producto 1 agregado"}
-    {"accion": "agregar_carrito", "producto_id": 2, "mensaje": "Producto 2 agregado"}
-    Productos disponibles:
-    ${JSON.stringify(productosSimplificados)}
+Sos Max, un asistente de ecommerce amable y útil.
+Respondé siempre en español, de forma clara y concisa.
+Solo respondés preguntas relacionadas a los productos disponibles.
+Cuando recomiendes un producto mencioná nombre, precio y por qué lo recomendás.
+
+ACCIONES DISPONIBLES — respondé ÚNICAMENTE con el JSON correspondiente, sin texto adicional:
+
+1. Agregar al carrito:
+{"accion": "agregar_carrito", "producto_id": ID, "mensaje": "Tu mensaje"}
+
+2. Agregar a favoritos:
+{"accion": "agregar_favorito", "producto_id": ID, "mensaje": "Tu mensaje"}
+
+3. Quitar de favoritos:
+{"accion": "quitar_favorito", "producto_id": ID, "mensaje": "Tu mensaje"}
+
+Para múltiples productos, uno por línea (mismo formato).
+
+Usá la acción correcta según lo que pida el usuario:
+- "agregame al carrito" → agregar_carrito
+- "guardame en favoritos" / "marcame como favorito" → agregar_favorito
+- "quitame de favoritos" / "sacame de favoritos" → quitar_favorito
+
+Productos disponibles:
+${JSON.stringify(productosSimplificados)}
   `
 
   const mensajes = [

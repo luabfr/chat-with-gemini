@@ -6,6 +6,8 @@ import "./globals.css"
 import Script from "next/script"  
 import Clarity from '@microsoft/clarity';
 import { Analytics } from "@vercel/analytics/next"
+import { FavoritosProvider } from "./context/FavoritosContext"  
+import { SpeedInsights } from "@vercel/speed-insights/next"
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   const projectId = "wzudpbde88"
@@ -18,21 +20,23 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body style={{ background: "#ffffff",color: "#1a1a1a",margin: 0 }}>
         <Analytics />
         <CartProvider>
-          <Navbar />
-          <div style={{
-            display: "flex",
-            minHeight: "calc(100vh - 64px)"
-          }}>
-            <ChatSidebar />
+          <FavoritosProvider> 
+            <Navbar />
             <div style={{
-              flex: 1,
-              minWidth: 0,
-              overflowY: "auto"
+              display: "flex",
+              minHeight: "calc(100vh - 64px)"
             }}>
-              {children}
+              <ChatSidebar />
+              <div style={{
+                flex: 1,
+                minWidth: 0,
+                overflowY: "auto"
+              }}>
+                {children}
+              </div>
             </div>
-          </div>
-          <Cart />
+            <Cart />
+          </FavoritosProvider>
         </CartProvider>
 
 
@@ -46,7 +50,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             })(window, document, "clarity", "script", "wzudpbde88");
           `}
         </Script>
-
+        <SpeedInsights />
       </body>
     </html>
   )
