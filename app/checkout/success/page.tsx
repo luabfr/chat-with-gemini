@@ -1,5 +1,5 @@
 "use client"
-import { useEffect,useState,useRef,Suspense } from "react"
+import { useEffect,useRef,Suspense } from "react"
 import { useSearchParams } from "next/navigation"
 import Link from "next/link"
 import { useCart } from "../../context/CartContext"
