@@ -1,9 +1,9 @@
-import { MercadoPagoConfig } from "mercadopago"
+// import { MercadoPagoConfig } from "mercadopago"
 import { createClient } from "../../lib/supabase/server"
 
-const client = new MercadoPagoConfig({
-	accessToken: process.env.MP_ACCESS_TOKEN!
-})
+// const client = new MercadoPagoConfig({
+// 	accessToken: process.env.MP_ACCESS_TOKEN!
+// })
 export async function POST(req: Request) {
 	try {
 		const body = await req.json()
