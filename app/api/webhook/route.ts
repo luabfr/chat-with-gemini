@@ -1,4 +1,4 @@
-import { MercadoPagoConfig,Payment } from "mercadopago"
+import { MercadoPagoConfig } from "mercadopago"
 import { createClient } from "../../lib/supabase/server"
 
 const client = new MercadoPagoConfig({
