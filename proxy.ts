@@ -3,7 +3,8 @@ import { NextResponse,type NextRequest } from "next/server"
 
 const RUTAS_PROTEGIDAS = ["/cuenta","/checkout"]
 
-export async function middleware(request: NextRequest) {
+// export async function middleware(request: NextRequest) {
+	export async function proxy(request: NextRequest) {
 	let supabaseResponse = NextResponse.next({ request })
 
 	const supabase = createServerClient(
@@ -55,3 +56,5 @@ export const config = {
 		"/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)"
 	]
 }
+
+export { proxy as default }
