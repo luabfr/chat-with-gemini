@@ -4,13 +4,11 @@ import { createClient } from "../../lib/supabase/server"
 const client = new MercadoPagoConfig({
 	accessToken: process.env.MP_ACCESS_TOKEN!
 })
-
 export async function POST(req: Request) {
 	try {
 		const body = await req.json()
+		console.log("Webhook recibido:",JSON.stringify(body))
 
-		// MP manda distintos tipos de notificaciones
-		// Solo nos interesan las de "payment"
 		if (body.type !== "payment") {
 			return Response.json({ ok: true })
 		}
@@ -18,16 +16,19 @@ export async function POST(req: Request) {
 		const paymentId = body.data?.id
 		if (!paymentId) return Response.json({ ok: true })
 
-		// Consultar el pago a MP para obtener el estado real
-		const payment = new Payment(client)
-		const pagoData = await payment.get({ id: paymentId })
+		// Consultar el pago directamente a MP
+		const mpRes = await fetch(
+			`https://api.mercadopago.com/v1/payments/${paymentId}`,
+			{ headers: { Authorization: `Bearer ${process.env.MP_ACCESS_TOKEN}` } }
+		)
+		const pagoData = await mpRes.json()
+		console.log("Pago data:",JSON.stringify(pagoData))
 
 		const ordenId = pagoData.external_reference
-		const mpStatus = pagoData.status  // approved | pending | rejected | cancelled
+		const mpStatus = pagoData.status
 
-		if (!ordenId) return Response.json({ ok: true })
+		if (!ordenId || !mpStatus) return Response.json({ ok: true })
 
-		// Mapear estado de MP a estado interno
 		const estadoMap: Record<string,string> = {
 			approved: "pagado",
 			pending: "pendiente",
@@ -36,10 +37,9 @@ export async function POST(req: Request) {
 			cancelled: "cancelado",
 		}
 
-		const nuevoEstado = estadoMap[mpStatus ?? ""] ?? "pendiente"
+		const nuevoEstado = estadoMap[mpStatus] ?? "pendiente"
 
 		const supabase = await createClient()
-
 		await supabase
 			.from("ordenes")
 			.update({
@@ -52,7 +52,6 @@ export async function POST(req: Request) {
 
 	} catch (error) {
 		console.error("Error en webhook:",error)
-		// Siempre devolver 200 a MP para que no reintente indefinidamente
 		return Response.json({ ok: true })
 	}
 }
