@@ -1,6 +1,6 @@
 "use client"
 import { useState } from "react"
-import { useRouter } from "next/navigation"
+// import { useRouter } from "next/navigation"
 import Link from "next/link"
 import NextImage from "next/image"
 import { useCart } from "../context/CartContext"
@@ -18,7 +18,7 @@ export default function Checkout() {
 	})
 	const [errores,setErrores] = useState<Record<string,string>>({})
 	const [cargando,setCargando] = useState(false)
-	const router = useRouter()
+	// const router = useRouter()
 
 	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setForm({ ...form,[e.target.name]: e.target.value })
