@@ -1,24 +1,24 @@
 "use client"
 import { useState } from "react"
+import { useRouter } from "next/navigation"
 import Link from "next/link"
 import NextImage from "next/image"
 import { useCart } from "../context/CartContext"
 
-type Paso = "carrito" | "datos" | "confirmacion"
+type Paso = "carrito" | "datos"
 
 export default function Checkout() {
-	const { carrito,totalItems,totalPrecio,vaciarCarrito } = useCart()
+	const { carrito,totalItems,totalPrecio } = useCart()
 	const [paso,setPaso] = useState<Paso>("carrito")
 	const [form,setForm] = useState({
 		nombre: "",
 		email: "",
 		direccion: "",
 		ciudad: "",
-		tarjeta: "",
-		vencimiento: "",
-		cvv: ""
 	})
 	const [errores,setErrores] = useState<Record<string,string>>({})
+	const [cargando,setCargando] = useState(false)
+	const router = useRouter()
 
 	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setForm({ ...form,[e.target.name]: e.target.value })
@@ -31,20 +31,45 @@ export default function Checkout() {
 		if (!form.email.includes("@")) nuevosErrores.email = "Email inválido"
 		if (!form.direccion.trim()) nuevosErrores.direccion = "Requerido"
 		if (!form.ciudad.trim()) nuevosErrores.ciudad = "Requerido"
-		if (form.tarjeta.replace(/\s/g,"").length < 16) nuevosErrores.tarjeta = "Número inválido"
-		if (!form.vencimiento.match(/^\d{2}\/\d{2}$/)) nuevosErrores.vencimiento = "Formato MM/AA"
-		if (form.cvv.length < 3) nuevosErrores.cvv = "CVV inválido"
 		setErrores(nuevosErrores)
 		return Object.keys(nuevosErrores).length === 0
 	}
 
-	const confirmarPedido = () => {
+	const pagarConMP = async () => {
 		if (!validar()) return
-		vaciarCarrito()
-		setPaso("confirmacion")
+		setCargando(true)
+
+		try {
+			const res = await fetch("/api/create-preference",{
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({ carrito,form,totalPrecio }),
+			})
+
+			const data = await res.json()
+
+			if (!res.ok || data.error) {
+				alert("Hubo un error al iniciar el pago. Intentá de nuevo.")
+				setCargando(false)
+				return
+			}
+
+			// En sandbox usamos sandbox_init_point, en producción init_point
+			const url = process.env.NODE_ENV === "production"
+				? data.init_point
+				: data.sandbox_init_point
+
+			// Redirigir a MercadoPago
+			window.location.href = url
+
+		} catch (error) {
+			console.error("Error al crear preferencia:",error)
+			alert("Hubo un error. Intentá de nuevo.")
+			setCargando(false)
+		}
 	}
 
-	if (carrito.length === 0 && paso !== "confirmacion") {
+	if (carrito.length === 0) {
 		return (
 			<main style={{ maxWidth: 600,margin: "80px auto",padding: "0 20px",textAlign: "center" }}>
 				<p style={{ fontSize: 48,marginBottom: 16 }}>🛒</p>
@@ -61,51 +86,6 @@ export default function Checkout() {
 				}}>
 					Ver productos
 				</Link>
-			</main>
-		)
-	}
-
-	// Paso confirmación
-	if (paso === "confirmacion") {
-		return (
-			<main style={{ maxWidth: 600,margin: "80px auto",padding: "0 20px",textAlign: "center" }}>
-				<div style={{
-					background: "white",
-					border: "1px solid #e0e0e0",
-					borderRadius: 16,
-					padding: 48
-				}}>
-					<p style={{ fontSize: 64,margin: "0 0 16px" }}>✅</p>
-					<h1 style={{ margin: "0 0 8px",fontSize: 28 }}>¡Pedido confirmado!</h1>
-					<p style={{ color: "#666",marginBottom: 8 }}>
-						Gracias, <strong>{form.nombre}</strong>
-					</p>
-					<p style={{ color: "#666",marginBottom: 32,fontSize: 14 }}>
-						Te enviamos la confirmación a <strong>{form.email}</strong>
-					</p>
-					<div style={{
-						background: "#f9f9f9",
-						borderRadius: 8,
-						padding: 16,
-						marginBottom: 32,
-						fontSize: 14,
-						color: "#444"
-					}}>
-						<p style={{ margin: "0 0 4px" }}>📦 Entrega estimada: 3-5 días hábiles</p>
-						<p style={{ margin: 0 }}>📍 {form.direccion}, {form.ciudad}</p>
-					</div>
-					<Link href="/" style={{
-						display: "inline-block",
-						padding: "12px 28px",
-						background: "#0070f3",
-						color: "white",
-						borderRadius: 8,
-						textDecoration: "none",
-						fontWeight: 600
-					}}>
-						Volver al inicio
-					</Link>
-				</div>
 			</main>
 		)
 	}
@@ -127,13 +107,13 @@ export default function Checkout() {
 
 			{/* Indicador de pasos */}
 			<div style={{ display: "flex",alignItems: "center",marginBottom: 40,gap: 0 }}>
-				{(["carrito","datos","confirmacion"] as Paso[]).map((p,i) => (
-					<div key={p} style={{ display: "flex",alignItems: "center",flex: i < 2 ? 1 : 0 }}>
+				{(["carrito","datos"] as Paso[]).map((p,i) => (
+					<div key={p} style={{ display: "flex",alignItems: "center",flex: i < 1 ? 1 : 0 }}>
 						<div style={{
 							width: 32,
 							height: 32,
 							borderRadius: "50%",
-							background: paso === p ? "#0070f3" : p === "confirmacion" || (paso === "datos" && p === "carrito") ? "#e8f5e9" : "#f0f0f0",
+							background: paso === p ? "#0070f3" : (paso === "datos" && p === "carrito") ? "#e8f5e9" : "#f0f0f0",
 							color: paso === p ? "white" : "#666",
 							display: "flex",
 							alignItems: "center",
@@ -142,7 +122,7 @@ export default function Checkout() {
 							fontWeight: 700,
 							flexShrink: 0
 						}}>
-							{i + 1}
+							{(paso === "datos" && p === "carrito") ? "✓" : i + 1}
 						</div>
 						<span style={{
 							marginLeft: 8,
@@ -151,15 +131,10 @@ export default function Checkout() {
 							color: paso === p ? "#0070f3" : "#666",
 							whiteSpace: "nowrap"
 						}}>
-							{p === "carrito" ? "Resumen" : p === "datos" ? "Tus datos" : "Confirmación"}
+							{p === "carrito" ? "Resumen" : "Tus datos"}
 						</span>
-						{i < 2 && (
-							<div style={{
-								flex: 1,
-								height: 1,
-								background: "#e0e0e0",
-								margin: "0 12px"
-							}} />
+						{i < 1 && (
+							<div style={{ flex: 1,height: 1,background: "#e0e0e0",margin: "0 12px" }} />
 						)}
 					</div>
 				))}
@@ -240,7 +215,7 @@ export default function Checkout() {
 					{paso === "datos" && (
 						<div>
 							<h2 style={{ fontSize: 18,fontWeight: 700,marginBottom: 20 }}>
-								Datos de envío y pago
+								Datos de envío
 							</h2>
 
 							<div style={{
@@ -248,7 +223,7 @@ export default function Checkout() {
 								border: "1px solid #e0e0e0",
 								borderRadius: 12,
 								padding: 24,
-								marginBottom: 16
+								marginBottom: 24
 							}}>
 								<h3 style={{ margin: "0 0 16px",fontSize: 15,fontWeight: 700 }}>📦 Envío</h3>
 								<div style={{ display: "grid",gap: 12 }}>
@@ -275,45 +250,27 @@ export default function Checkout() {
 								</div>
 							</div>
 
+							{/* Info MP */}
 							<div style={{
-								background: "white",
-								border: "1px solid #e0e0e0",
+								background: "#f0f7ff",
+								border: "1px solid #bfdbfe",
 								borderRadius: 12,
-								padding: 24,
-								marginBottom: 24
+								padding: "14px 18px",
+								marginBottom: 24,
+								display: "flex",
+								alignItems: "center",
+								gap: 12,
+								fontSize: 13,
+								color: "#1e40af"
 							}}>
-								<h3 style={{ margin: "0 0 16px",fontSize: 15,fontWeight: 700 }}>💳 Pago</h3>
-								<div style={{ display: "grid",gap: 12 }}>
-									<div>
-										<label style={{ fontSize: 13,fontWeight: 600,color: "#333" }}>Número de tarjeta</label>
-										<input
-											name="tarjeta"
-											value={form.tarjeta}
-											onChange={handleChange}
-											style={inputStyle("tarjeta")}
-											placeholder="1234 5678 9012 3456"
-											maxLength={19}
-										/>
-										{errores.tarjeta && <p style={{ color: "#e53e3e",fontSize: 12,margin: "4px 0 0" }}>{errores.tarjeta}</p>}
-									</div>
-									<div style={{ display: "grid",gridTemplateColumns: "1fr 1fr",gap: 12 }}>
-										<div>
-											<label style={{ fontSize: 13,fontWeight: 600,color: "#333" }}>Vencimiento</label>
-											<input name="vencimiento" value={form.vencimiento} onChange={handleChange} style={inputStyle("vencimiento")} placeholder="MM/AA" maxLength={5} />
-											{errores.vencimiento && <p style={{ color: "#e53e3e",fontSize: 12,margin: "4px 0 0" }}>{errores.vencimiento}</p>}
-										</div>
-										<div>
-											<label style={{ fontSize: 13,fontWeight: 600,color: "#333" }}>CVV</label>
-											<input name="cvv" value={form.cvv} onChange={handleChange} style={inputStyle("cvv")} placeholder="123" maxLength={4} />
-											{errores.cvv && <p style={{ color: "#e53e3e",fontSize: 12,margin: "4px 0 0" }}>{errores.cvv}</p>}
-										</div>
-									</div>
-								</div>
+								<span style={{ fontSize: 20 }}>🔒</span>
+								<span>El pago se procesa de forma segura a través de <strong>MercadoPago</strong>. Aceptamos tarjetas, débito y más.</span>
 							</div>
 
 							<div style={{ display: "flex",gap: 12 }}>
 								<button
 									onClick={() => setPaso("carrito")}
+									disabled={cargando}
 									style={{
 										flex: 1,
 										padding: 14,
@@ -323,26 +280,46 @@ export default function Checkout() {
 										borderRadius: 8,
 										fontSize: 15,
 										fontWeight: 600,
-										cursor: "pointer"
+										cursor: cargando ? "not-allowed" : "pointer"
 									}}
 								>
 									← Volver
 								</button>
 								<button
-									onClick={confirmarPedido}
+									onClick={pagarConMP}
+									disabled={cargando}
 									style={{
 										flex: 2,
 										padding: 14,
-										background: "#0070f3",
+										background: cargando ? "#93c5fd" : "#009ee3",  // azul MP
 										color: "white",
 										border: "none",
 										borderRadius: 8,
 										fontSize: 15,
 										fontWeight: 700,
-										cursor: "pointer"
+										cursor: cargando ? "not-allowed" : "pointer",
+										display: "flex",
+										alignItems: "center",
+										justifyContent: "center",
+										gap: 8,
+										transition: "background 0.2s"
 									}}
 								>
-									Confirmar pedido ✓
+									{cargando ? (
+										<>
+											<span style={{
+												width: 16,height: 16,
+												border: "2px solid rgba(255,255,255,0.4)",
+												borderTopColor: "white",
+												borderRadius: "50%",
+												display: "inline-block",
+												animation: "spin 0.8s linear infinite"
+											}} />
+											Iniciando pago...
+										</>
+									) : (
+										<>Pagar con MercadoPago</>
+									)}
 								</button>
 							</div>
 						</div>
